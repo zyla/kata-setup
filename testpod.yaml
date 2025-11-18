@@ -4,7 +4,8 @@ metadata:
   name: kata-test
 spec:
   runtimeClassName: kata-cloud-hypervisor
+  restartPolicy: Never
   containers:
   - name: busybox
     image: busybox:latest
-    command: ["sleep", "3600"]
+    command: ["echo", "Hello"]

@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: build-csi-kata-directvolume
+spec:
+  runtimeClassName: kata-cloud-hypervisor
+  containers:
+    - name: buildah
+      image: alpine:latest
+      command:
+      - sh
+      - -c
+      - |
+        apk add go=1.24.9-r0 git make buildah
+        git clone https://github.com/kata-containers/kata-containers -b 3.23.0 --depth 1
+        cd kata-containers/src/tools/csi-kata-directvolume
+        make
+        buildah build -t registry.default.svc.cluster.local:5000/csi-kata-directvolume:latest .
+        buildah push registry.default.svc.cluster.local:5000/csi-kata-directvolume:latest
+
+      env:
+        - name: STORAGE_DRIVER
+          value: vfs
+        - name: BUILDAH_ISOLATION
+          value: chroot
