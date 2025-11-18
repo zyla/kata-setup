@@ -204,7 +204,7 @@ spec:
         # vhost there.
         - hostPath:
             path: /var/lib/spdk/vhost
-            type: Directory
+            type: DirectoryOrCreate
           name: vhost-dir
         # rawdisk there.
         - hostPath:
