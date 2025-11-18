@@ -8,6 +8,6 @@ set -euo pipefail
 export VERSION=3.23.0
 export CHART="oci://ghcr.io/kata-containers/kata-deploy-charts/kata-deploy"
 
-helm install kata-deploy -n kube-system "${CHART}" --version "${VERSION}" --wait --debug -f values.yaml
+helm upgrade --install kata-deploy -n kube-system "${CHART}" --version "${VERSION}" --wait --debug -f values.yaml
 
 kubectl get pods -n kube-system | grep kata
