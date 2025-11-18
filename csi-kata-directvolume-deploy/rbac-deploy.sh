@@ -65,17 +65,6 @@ echo "Namespace kata-directvolume created Done !"
 # rbac rules
 echo "Applying RBAC rules ..."
 
-eval component="CSI_PROVISIONER"
-eval current="\${${component}_RBAC}"
-eval original="\${${component}_RBAC_YAML}"
-
-if [[ "${current}" =~ ^http:// ]] || [[ "${current}" =~ ^https:// ]]; then
-    run curl "${current}" --output "${TEMP_DIR}"/rbac.yaml --silent --location
-fi
-
-# replace the default namespace with specified namespace kata-directvolume
-sed -e "s/namespace: default/namespace: kata-directvolume/g" "${TEMP_DIR}"/rbac.yaml > "${DEPLOY_DIR}/kata-directvol-rbac.yaml"
-
 # apply the kata-directvol-rbac.yaml
 run kubectl apply -f "${DEPLOY_DIR}/kata-directvol-rbac.yaml"
 echo "Applying RBAC rules Done!"
