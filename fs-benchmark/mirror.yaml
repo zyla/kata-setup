@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mirror
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClass: local-path
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: setup-mirror
+spec:
+  restartPolicy: Never
+  containers:
+  - name: app
+    image: mcr.microsoft.com/devcontainers/base:ubuntu
+    command:
+    - bash
+    - -c
+    - |
+      set -euo pipefail
+      cd /data
+      git clone --bare https://github.com/kubernetes/kubernetes.git --depth 100
+      cd kubernetes.git
+      git bundle create /data/kubernetes.bundle --all
+    volumeMounts:
+    - name: fs
+      mountPath: /data
+  volumes:
+  - name: fs
+    persistentVolumeClaim:
+      claimName: mirror
