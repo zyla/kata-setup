@@ -12,3 +12,4 @@ BASE_DIR=$(dirname "$0")
 
 ${BASE_DIR}/rbac-deploy.sh
 ${BASE_DIR}/directvol-deploy.sh
+kubectl apply -f ${BASE_DIR}/kata-directvolume/csi-storageclass.yaml
