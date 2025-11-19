@@ -1,6 +1,6 @@
-FROM alpine:latest AS builder
+FROM alpine:3.22 AS builder
 
-RUN apk add --no-cache go=1.24.9-r0 git make
+RUN apk add --no-cache go~=1.24 git make
 RUN git clone https://github.com/kata-containers/kata-containers -b 3.23.0 --depth 1
 RUN cd kata-containers/src/tools/csi-kata-directvolume && make
 
