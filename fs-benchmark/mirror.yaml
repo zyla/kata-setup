@@ -5,7 +5,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClass: local-path
+  storageClassName: local-path
   volumeMode: Filesystem
   resources:
     requests:
@@ -14,25 +14,45 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: setup-mirror
+  name: mirror
+  labels:
+    service: mirror
 spec:
-  restartPolicy: Never
   containers:
   - name: app
-    image: mcr.microsoft.com/devcontainers/base:ubuntu
+    imagePullPolicy: Never
+    image: localhost/simple-git-http-server
     command:
-    - bash
+    - sh
     - -c
     - |
       set -euo pipefail
-      cd /data
-      git clone --bare https://github.com/kubernetes/kubernetes.git --depth 100
+
+      cd /git
+      if [ ! -d kubernetes.git ]; then
+        git clone --bare https://github.com/kubernetes/kubernetes.git --depth 50
+      fi
       cd kubernetes.git
-      git bundle create /data/kubernetes.bundle --all
+      git update-server-info
+
+      cd /
+      spawn-fcgi -s /run/fcgi.sock -U nginx /usr/bin/fcgiwrap
+      nginx -g "daemon off;"
     volumeMounts:
     - name: fs
-      mountPath: /data
+      mountPath: /git
   volumes:
   - name: fs
     persistentVolumeClaim:
       claimName: mirror
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mirror
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    service: mirror
